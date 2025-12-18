@@ -51,9 +51,8 @@ export async function onRequest(context) {
   
   // Handle 'callback' route - usually frontend handles this, but if we get here
   if (providerKey === 'callback') {
-     // Pass through to the next handler (static assets)
-     // This allows the frontend (index.html) to load and handle the callback URL
-     return context.next();
+     // Explicitly return index.html for SPA routing
+     return env.ASSETS.fetch(new Request(new URL("/index.html", request.url), request));
   }
 
   const provider = providers[providerKey];
