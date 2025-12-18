@@ -31,12 +31,33 @@ export async function onRequest(context) {
   };
 
   // Determine provider from URL path (e.g. /oauth2/githubToken -> githubToken)
-  const pathParts = url.pathname.split('/');
-  const providerKey = pathParts[pathParts.length - 1];
+  // url.pathname could be "/oauth2/callback" if it's the callback, but here we are handling token exchange
+  // The frontend calls: /oauth2/githubToken?code=...
+  
+  // Cloudflare Pages Functions routing: 
+  // If file is functions/oauth2/[[path]].js, then context.params.path will be an array
+  // e.g. /oauth2/githubToken -> path: ["githubToken"]
+  
+  let providerKey;
+  if (context.params && context.params.path) {
+      providerKey = Array.isArray(context.params.path) 
+          ? context.params.path[context.params.path.length - 1] 
+          : context.params.path;
+  } else {
+      // Fallback for manual path parsing if params not available
+      const pathParts = url.pathname.split('/');
+      providerKey = pathParts[pathParts.length - 1];
+  }
+  
+  // Handle 'callback' route - usually frontend handles this, but if we get here
+  if (providerKey === 'callback') {
+     return new Response("This is the callback URL. It should be handled by the frontend application, not the backend API.", { status: 200 });
+  }
+
   const provider = providers[providerKey];
 
   if (!provider) {
-    return new Response("Unknown provider", { status: 400 });
+    return new Response(`Unknown provider: ${providerKey}. Path: ${url.pathname}`, { status: 400 });
   }
 
   // Construct request parameters
