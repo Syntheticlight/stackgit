@@ -51,7 +51,9 @@ export async function onRequest(context) {
   
   // Handle 'callback' route - usually frontend handles this, but if we get here
   if (providerKey === 'callback') {
-     return new Response("This is the callback URL. It should be handled by the frontend application, not the backend API.", { status: 200 });
+     // Pass through to the next handler (static assets)
+     // This allows the frontend (index.html) to load and handle the callback URL
+     return context.next();
   }
 
   const provider = providers[providerKey];
