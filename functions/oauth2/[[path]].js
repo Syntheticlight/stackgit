@@ -49,10 +49,21 @@ export async function onRequest(context) {
       providerKey = pathParts[pathParts.length - 1];
   }
   
-  // Handle 'callback' route - usually frontend handles this, but if we get here
+  // Handle 'callback' route
   if (providerKey === 'callback') {
-     // Explicitly return index.html for SPA routing
-     return env.ASSETS.fetch(new Request(new URL("/index.html", request.url), request));
+     // Return the content of callback.html which sends the code back to the main window
+     const html = `<!DOCTYPE html>
+<html>
+<body>
+<script>
+  var origin = location.protocol + '//' + location.host;
+  (window.opener || window.parent).postMessage(location.hash || location.search, origin);
+</script>
+</body>
+</html>`;
+     return new Response(html, {
+       headers: { "Content-Type": "text/html" }
+     });
   }
 
   const provider = providers[providerKey];
