@@ -17,16 +17,6 @@ export async function onRequest(context) {
       url: "https://gitee.com/oauth/token",
       clientSecret: env.GITEE_CLIENT_SECRET,
       needRedirectUri: true
-    },
-    giteaToken: {
-      url: `${env.GITEA_URL}/login/oauth/access_token`,
-      clientSecret: env.GITEA_CLIENT_SECRET,
-      needRedirectUri: false
-    },
-    gitlabToken: {
-      url: `${env.GITLAB_URL}/oauth/token`,
-      clientSecret: env.GITLAB_CLIENT_SECRET,
-      needRedirectUri: false
     }
   };
 
